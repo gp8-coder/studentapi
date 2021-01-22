@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.studentapi.students.entity.student;
 import com.studentapi.students.entity.studentSkill;
+import com.studentapi.students.error.StudentNotFound;
 import com.studentapi.students.service.StudentService;
 
 @RestController
@@ -33,7 +34,7 @@ public class StudentController {
 		student s=service.findById(studentId);
 		
 		if(s == null) {
-			throw new RuntimeException("Student ID not found : "+ studentId);
+			throw new StudentNotFound("Student ID not found : "+ studentId);
 			
 		}
 		
@@ -57,7 +58,7 @@ public class StudentController {
 		student temp = service.findById(studentId);
 		
 		if(temp == null) {
-			throw new RuntimeException("Student ID not found : "+ studentId);
+			throw new StudentNotFound("Student ID not found : "+ studentId);
 		}
 		
 		service.deleteById(studentId);
@@ -68,8 +69,14 @@ public class StudentController {
 	@PostMapping("/skillUpdate/{id}")
 	public student addSkill(@PathVariable int id,@RequestBody studentSkill stdskill) {
 		student s = service.findById(id);
-		stdskill.setS(s);
+		if(s == null) {
+			throw new StudentNotFound("Student ID not found : "+ id);
+			
+		}
+		else{
+			stdskill.setS(s);
 		service.saveSkill(stdskill);
 		return s;
+		}
 	}
 }
